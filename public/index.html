@@ -82,16 +82,8 @@
   border-radius: 8px;
 }
 </style>
-<style>
-.disabled-button {
-  background-color: #ccc !important;
-  color: #666 !important;
-  cursor: not-allowed !important;
-  border: 1px solid #aaa !important;
-}
-</style>
 </head>
-<body><div id="tierStatus" style="font-weight:bold; margin-bottom:10px;">Checking license...</div>
+<body>
 <div class="container">
 <h2>🏡 PromptAgentHQ – Real Estate Listing Generator</h2>
 <label>Listing Type</label>
@@ -125,42 +117,8 @@
 <input id="lot" min="0" placeholder="e.g. 500" type="number"/>
 <label>Additional Features / Notes</label>
 <textarea id="notes" placeholder="e.g. Ocean views, pool, garden, fireplace..."></textarea>
-<div id="buyPrompt" style="margin-top: 20px; display: none;">
-<p><strong>🚀 Upgrade your plan to unlock full features:</strong></p>
-<div style="margin-top: 10px;">
-<a class="btn btn-primary" href="https://buy.stripe.com/test_6oU28r4s4fL8dergXV38401" style="margin-right: 10px;" target="_blank">
-      🔁 Monthly – $5.00
-    </a>
-<a class="btn btn-success" href="https://buy.stripe.com/test_5kQ8wP3o042qdercHF38400" target="_blank">
-      💼 Annual – $50.00
-    </a>
-</div>
-</div>
-<div id="buyPrompt" style="margin-top:15px; display:none;">
-<p style="color:#444; font-weight:bold;">
-    🚀 Unlock more features like Export &amp; Enhancement by upgrading to Pro.
-  </p>
-<a class="btn btn-primary" href="https://buy.stripe.com/test_5kQ8wP3o042qdercHF" target="_blank">Upgrade to Pro</a>
-</div>
 <label>Agency/Agent Details</label>
 <textarea id="agent" placeholder="e.g. John Doe\nExample Realty\n0712345678\njohn@example.com"></textarea>
-<div id="buyPrompt" style="margin-top: 20px; display: none;">
-<p><strong>🚀 Upgrade your plan to unlock full features:</strong></p>
-<div style="margin-top: 10px;">
-<a class="btn btn-primary" href="https://buy.stripe.com/test_6oU28r4s4fL8dergXV38401" style="margin-right: 10px;" target="_blank">
-      🔁 Monthly – $5.00
-    </a>
-<a class="btn btn-success" href="https://buy.stripe.com/test_5kQ8wP3o042qdercHF38400" target="_blank">
-      💼 Annual – $50.00
-    </a>
-</div>
-</div>
-<div id="buyPrompt" style="margin-top:15px; display:none;">
-<p style="color:#444; font-weight:bold;">
-    🚀 Unlock more features like Export &amp; Enhancement by upgrading to Pro.
-  </p>
-<a class="btn btn-primary" href="https://buy.stripe.com/test_5kQ8wP3o042qdercHF" target="_blank">Upgrade to Pro</a>
-</div>
 <label>Upload Logo Image (Max 2MB)</label>
 <input accept="image/*" id="logoFile" type="file"/>
 <div id="logo-preview"></div>
@@ -173,32 +131,15 @@
 <div id="result"></div>
 <div id="char-count"></div>
 <div id="export-buttons">
-<button id="copyButton" onclick="copyToClipboard()">Copy</button>
-<button id="exportWord" onclick="exportToWord()">Export Word</button>
-<button id="exportPDF" onclick="exportToPDF()">Export PDF</button>
-<button id="exportText" onclick="exportToText()">Export Text</button>
+<button onclick="copyToClipboard()">Copy</button>
+<button onclick="exportToWord()">Export Word</button>
+<button onclick="exportToPDF()">Export PDF</button>
+<button onclick="exportToText()">Export Text</button>
 <button onclick="clearAll()">Clear</button>
 </div>
 <label>Enhance or Correct Listing (Optional)</label>
 <textarea id="enhance" placeholder="e.g. Fix spelling, add more detail about garden..."></textarea>
-<div id="buyPrompt" style="margin-top: 20px; display: none;">
-<p><strong>🚀 Upgrade your plan to unlock full features:</strong></p>
-<div style="margin-top: 10px;">
-<a class="btn btn-primary" href="https://buy.stripe.com/test_6oU28r4s4fL8dergXV38401" style="margin-right: 10px;" target="_blank">
-      🔁 Monthly – $5.00
-    </a>
-<a class="btn btn-success" href="https://buy.stripe.com/test_5kQ8wP3o042qdercHF38400" target="_blank">
-      💼 Annual – $50.00
-    </a>
-</div>
-</div>
-<div id="buyPrompt" style="margin-top:15px; display:none;">
-<p style="color:#444; font-weight:bold;">
-    🚀 Unlock more features like Export &amp; Enhancement by upgrading to Pro.
-  </p>
-<a class="btn btn-primary" href="https://buy.stripe.com/test_5kQ8wP3o042qdercHF" target="_blank">Upgrade to Pro</a>
-</div>
-<button id="applyEnhancement" onclick="applyEnhancement()">Apply Enhancement</button>
+<button onclick="applyEnhancement()">Apply Enhancement</button>
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
@@ -212,61 +153,6 @@ function deleteImage(button) {
   const container = button.parentElement;
   container.remove();
 }
-<script>
-function updateFeatureAccess() {
-  const tier = window.userTier || 'free';
-  document.getElementById("tierStatus").innerText = "Current Tier: " + tier;
-
-  const isPro = tier === "pro";
-  const isPremium = tier === "premium";
-
-  document.querySelectorAll(".enhance-btn").forEach(btn => btn.disabled = !isPro && !isPremium);
-  document.querySelectorAll(".export-btn").forEach(btn => btn.disabled = !isPremium);
-  document.querySelectorAll(".download-btn").forEach(btn => btn.disabled = tier === "free");
-
-  const buyPrompt = document.getElementById("buyPrompt");
-  if (buyPrompt) buyPrompt.style.display = (tier === "free") ? "block" : "none";
-}
-
-function verifyAndSetTier(key) {
-  fetch(`/validate-license?key=${key}`)
-    .then(res => res.json())
-    .then(data => {
-      window.userTier = data.tier || "free";
-      updateFeatureAccess();
-    }).catch(err => {
-      console.warn("License check failed:", err);
-      window.userTier = "free";
-      updateFeatureAccess();
-    });
-}
-
-function loadLicenseFromLocalStorage() {
-  const key = localStorage.getItem("licenseKey");
-  if (key) {
-    document.getElementById("licenseKeyInput").value = "••••••••";
-    verifyAndSetTier(key);
-  } else {
-    window.userTier = "free";
-    updateFeatureAccess();
-  }
-}
-
-function saveLicense() {
-  const key = document.getElementById("licenseKeyInput").value;
-  if (!key) return alert("Please enter a license key.");
-  localStorage.setItem("licenseKey", key);
-  document.getElementById("licenseKeyInput").value = "••••••••";
-  verifyAndSetTier(key);
-}
-
-function clearLicense() {
-  localStorage.removeItem("licenseKey");
-  document.getElementById("licenseKeyInput").value = "";
-  window.userTier = "free";
-  updateFeatureAccess();
-}
-window.addEventListener("DOMContentLoaded", loadLicenseFromLocalStorage);
 </script>
 <script>
 window.logoImageBase64 = "";
@@ -323,7 +209,6 @@ Property Details:
       });
 
       const data = await res.json();
-    console.log("🔍 Backend verification result:", data);
       const output = data.result || "Something went wrong.";
       
   /*      
@@ -373,14 +258,10 @@ const decorated = output + "<br><br>" + bullets;
       });
     }
 
-    
-
-function copyToClipboard() {
-  const text = document.getElementById("result").textContent;
-  navigator.clipboard.writeText(text).then(() => alert("✅ Copied to clipboard!"));
-}
-
-
+    function copyToClipboard() {
+      const text = document.getElementById("result").textContent;
+      navigator.clipboard.writeText(text).then(() => alert("✅ Copied to clipboard!"));
+    }
 
     function exportToText() {
       const text = document.getElementById("result").textContent;
@@ -619,305 +500,6 @@ function deleteImage(button) {
   const container = button.parentElement;
   container.remove();
 }
-</script>
-<div id="manual-license" style="margin-top: 20px; padding: 12px; border: 1px solid #ccc; border-radius: 8px;">
-<label for="licenseKey">🔑 Enter License Key</label>
-<input id="licenseKeyInput" placeholder="Paste your license key" type="text"/>
-<button onclick="submitManualKey()">Submit Key</button>
-<button id="clearLicenseButton" style="background: #d9534f; color: white; margin-top: 10px;">
-  🧹 Clear License
-</button>
-</div><div id="stripePurchase" style="margin-top: 20px; display: none; background: #fefefe; padding: 14px; border: 1px solid #ddd; border-radius: 8px;">
-<p><strong>Upgrade for Pro Features:</strong></p>
-<ul style="list-style: none; padding-left: 0;">
-<li><a href="https://buy.stripe.com/test_6oU28r4s4fL8dergXV38401" target="_blank">🟢 $5/month - PromptAgentHQ Monthly</a></li>
-<li><a href="https://buy.stripe.com/test_5kQ8wP3o042qdercHF38400" target="_blank">🟢 $50/year - Annual (save 17%)</a></li>
-</ul>
-</div><script>
-function submitManualKey() {
-  const key = document.getElementById("licenseKeyInput").value.trim();
-  if (!key) return alert("Enter a license key.");
-
-  localStorage.setItem("licenseKey", key);
-  verifyAndSetTier(); // ✅ Will call backend to verify tier
-  alert("✅ License key saved. Please wait for verification.");
-},
-    body: JSON.stringify({ key })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data && data.valid) {
-      localStorage.setItem("licenseKey", key);
-      window.userTier = data.tier || 'free';
-      updateFeatureAccess();
-      alert("✅ License applied.");
-    } else {
-      alert("❌ Invalid license key.");
-    }
-  })
-  .catch(err => {
-    console.error("Validation error:", err);
-    alert("❌ Could not validate license.");
-  });
-}
-
-
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const storedKey = localStorage.getItem("licenseKey");
-  if (!storedKey) return updateFeatureAccess();
-
-  
-});
-    </script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const storedKey = localStorage.getItem("licenseKey");
-
-  if (!storedKey) {
-    window.userTier = 'free';
-  } else {
-    const licenseInput = document.getElementById("licenseKeyInput");
-    if (licenseInput) {
-      licenseInput.value = '*'.repeat(storedKey.length);
-      licenseInput.dataset.masked = "true";
-    }
-    
-  }
-
-  updateFeatureAccess();
-});
-
-document.getElementById("licenseKeyInput").addEventListener("focus", function () {
-  if (this.dataset.masked === "true") {
-    this.value = "";
-    delete this.dataset.masked;
-  }
-});
-
-function saveLicense() {
-  const input = document.getElementById("licenseKeyInput");
-  if (input.dataset.masked === "true") {
-    alert("⚠️ Please enter a new license key.");
-    return;
-  }
-
-  const key = input.value.trim();
-  if (!key) {
-    alert("❌ License key cannot be empty.");
-    return;
-  }
-
-  localStorage.setItem("licenseKey", key);
-  window.userTier = 'pro';
-  updateFeatureAccess();
-  alert("✅ License saved. Access granted.");
-}
-
-
-  });
-}
-</script><script>
-function clearLicense() {
-    const confirmClear = confirm("Are you sure you want to clear the license key?");
-    if (!confirmClear) return;
-
-    localStorage.removeItem("licenseKey");
-    window.userTier = "free";
-    updateFeatureAccess();
-    alert("✅ License key has been cleared. Downgraded to Free Plan.");
-}
-</script>
-<script>
-document.getElementById("clearLicenseButton").addEventListener("click", function () {
-  localStorage.removeItem("licenseKey");
-  window.userTier = "free";
-  updateFeatureAccess();
-  alert("🔓 License cleared. Reverted to Free tier.");
-  location.reload();
-});
-</script>
-<script>
-async function verifyAndSetTier() {
-  const key = localStorage.getItem("licenseKey");
-
-  if (!key) {
-    console.warn("⚠️ No license key found. Defaulting to Free tier.");
-    window.userTier = "free";
-    updateFeatureAccess();  // ✅ Ensure DOM is updated
-    return;
-  }
-
-  try {
-    const res = await fetch(`/api/checkLicense?key=${key}`);
-    const data = await res.json();
-
-    if (data && data.tier) {
-      window.userTier = data.tier;
-    } else {
-      window.userTier = "free";
-    }
-  } catch (err) {
-    console.error("❌ License verification error:", err);
-    window.userTier = "free";
-  }
-
-  updateFeatureAccess();
-}
-
-  try {
-    const res = await fetch(`/api/checkLicense?key=${key}`);
-    const data = await res.json();
-    console.log("🔍 Backend verification result:", data);
-    window.userTier = data && data.tier ? data.tier : "free";
-  } catch (err) {
-    console.warn("⚠️ Failed to verify license:", err.message);
-    window.userTier = "free";
-  }
-
-  updateFeatureAccess();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  const storedKey = localStorage.getItem("licenseKey");
-  const input = document.getElementById("licenseKeyInput");
-  const stripePrompt = document.getElementById("stripePurchase");
-
-  if (storedKey) {
-    input.value = '*'.repeat(storedKey.length);
-    input.dataset.masked = "true";
-
-    verifyAndSetTier();
-  } else {
-    window.userTier = 'free';
-    updateFeatureAccess();
-  }
-
-  input.addEventListener("focus", function () {
-    if (this.dataset.masked === "true") {
-      this.value = "";
-      delete this.dataset.masked;
-    }
-  });
-});
-
-function updateFeatureAccess() {
-  const isPro = (window.userTier === 'pro' || window.userTier === 'premium');
-  const exportButtons = ['exportWord', 'exportPDF', 'exportText', 'applyEnhancement'];
-  const stripePrompt = document.getElementById("stripePurchase");
-
-  exportButtons.forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.disabled = !isPro;
-      btn.style.opacity = isPro ? "1" : "0.5";
-      btn.style.pointerEvents = isPro ? "auto" : "none";
-    }
-  });
-
-  if (stripePrompt) {
-    stripePrompt.style.display = isPro ? 'none' : 'block';
-  }
-}
-</script>
-<script>
-function updateFeatureAccess() {
-  const tier = window.userTier || 'free';
-  const proButtons = [
-    document.getElementById('exportWord'),
-    document.getElementById('exportPDF'),
-    document.getElementById('exportText'),
-    document.getElementById('applyEnhancement')
-  ];
-  proButtons.forEach(btn => {
-    if (btn) {
-      btn.disabled = (tier !== 'pro');
-      btn.title = (tier !== 'pro') ? "Upgrade to Pro to use this feature." : "";
-    }
-  });
-  const tierDisplay = document.getElementById('tierDisplay');
-  if (tierDisplay) tierDisplay.textContent = tier;
-  const buyPrompt = document.getElementById('buyPrompt');
-  if (buyPrompt) buyPrompt.style.display = (tier === 'free') ? 'block' : 'none';
-}
-window.addEventListener("DOMContentLoaded", updateFeatureAccess);
-</script>
-<script>
-function updateFeatureAccess() {
-  const tier = window.userTier || 'Free';
-  const proOrPremium = tier === "Pro" || tier === "Premium";
-  const buttons = [
-    document.getElementById("exportWord"),
-    document.getElementById("exportPDF"),
-    document.getElementById("exportText"),
-    document.getElementById("applyEnhancement")
-  ];
-  buttons.forEach(btn => {
-    if (btn) {
-      btn.disabled = !proOrPremium;
-      if (!proOrPremium) {
-        btn.classList.add("disabled-button");
-      } else {
-        btn.classList.remove("disabled-button");
-      }
-    }
-  });
-  const buyPrompt = document.getElementById("buyPrompt");
-  if (buyPrompt) {
-    buyPrompt.style.display = proOrPremium ? "none" : "block";
-  }
-  const tierDisplay = document.getElementById("tierDisplay");
-  if (tierDisplay) tierDisplay.textContent = tier;
-}
-window.addEventListener("DOMContentLoaded", updateFeatureAccess);
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const savedTier = localStorage.getItem("userTier") || "Free";
-  const el = document.getElementById("tierDisplay");
-  if (el) el.innerText = savedTier;
-});
- window.addEventListener('load', () => {
-  const key = localStorage.getItem('licenseKey');
-  if (key) verifyAndSetTier(key); // ✅ FIXED (ensure immediate check on load)
-});   
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", async () => {
-    const key = localStorage.getItem("licenseKey");
-    if (key) {
-      try {
-        const res = await fetch(`/api/checkLicense?key=${key}`);
-        const data = await res.json();
-        if (data && data.tier) {
-          window.userTier = data.tier;
-          const badge = document.getElementById("tierBadge");
-          if (badge) {
-            badge.innerText = data.tier.charAt(0).toUpperCase() + data.tier.slice(1) + " Tier";
-          }
-          console.log(`✅ Tier set from license: ${data.tier}`);
-        } else {
-          console.warn("⚠️ No tier found from license key.");
-        }
-      } catch (err) {
-        console.error("❌ Error checking license key:", err);
-      }
-    } else {
-      window.userTier = "free";
-      console.log("ℹ️ No license key in localStorage. Defaulting to Free tier.");
-    }
-  });
-</script>
-<script>
-window.addEventListener("load", async () => {
-  const key = localStorage.getItem("licenseKey");
-  if (key) {
-    const tier = await getTierFromLicenseKey(key);
-    setTier(tier);
-  }
-});
 </script>
 </body>
 </html>
